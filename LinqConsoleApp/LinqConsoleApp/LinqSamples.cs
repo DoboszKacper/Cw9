@@ -259,8 +259,11 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad3()
         {
-            var maxSal = (from emp in Emps select emp.Salary).Max();
+            var maxSal = Emps.Max(emp => emp.Salary);
+
+            var maxSal2 = (from emp in Emps select emp.Salary).Max();
             Console.WriteLine(maxSal);
+            Console.WriteLine(maxSal2);
         }
 
         /// <summary>
@@ -274,7 +277,14 @@ namespace LinqConsoleApp
                 Zawod = x.Job,
                 Płaca = x.Salary
             });
+
+            var maxSal2 = Emps.Where(emp => emp.Salary == Emps.Max(emp1 => emp1.Salary));
             foreach (var sal in maxSal)
+            {
+                Console.WriteLine(sal);
+            }
+
+            foreach (var sal in maxSal2)
             {
                 Console.WriteLine(sal);
             }
@@ -376,7 +386,15 @@ namespace LinqConsoleApp
         public void Przyklad8()
         {
             var value = Emps.Any(x => x.Job == "Backend programmer").ToString();
+
+
+            var value2 = (from x in Emps
+                       where x.Job == "Backend programmer"
+                       select x).Any();
+
             Console.WriteLine(value);
+
+            Console.WriteLine(value2);
         }
 
         /// <summary>
@@ -390,9 +408,16 @@ namespace LinqConsoleApp
                 x.Ename,
                 x.Salary
             }).FirstOrDefault();
-           
-                Console.WriteLine(topOne);
-            
+
+            var topOne2 = (from emp in Emps
+                       orderby emp.HireDate descending
+                       where emp.Job == "Frontend programmer"
+                       select emp).FirstOrDefault();
+
+            Console.WriteLine(topOne);
+
+            Console.WriteLine(topOne2);
+
         }
 
         /// <summary>
@@ -407,9 +432,22 @@ namespace LinqConsoleApp
                 x.Ename,
                 x.Job,
                 x.HireDate
-            }).Union(new[] { new { Ename = "Brak wartości", Job = (string)null, HireDate = (DateTime?)null } }); ;
+            }).Union(new[] { new { Ename = "Brak wartości", Job = (string)null, HireDate = (DateTime?)null } });
+
+            var union2 = (from x in Emps
+                       select new
+                       {
+                           x.Ename,
+                           x.Job,
+                           x.HireDate
+                       }).Union(new[] { new { Ename = "Brak wartości", Job = (string)null, HireDate = (DateTime?)null } });
 
             foreach (var emp in union)
+            {
+                Console.WriteLine(emp);
+            }
+
+            foreach (var emp in union2)
             {
                 Console.WriteLine(emp);
             }
@@ -424,9 +462,14 @@ namespace LinqConsoleApp
                            x.Ename,
                            x.Salary
                        })
-                       .Aggregate((res, next) => res.Salary > next.Salary ? res : next);
+                       .Aggregate((res, next) => res.Salary > next.Salary ? next : res);
+
+            var p112 = (from x in Emps
+                       select x).Aggregate((res, next) => next.Salary > res.Salary ? next : res);
 
             Console.WriteLine(p11);
+
+            Console.WriteLine(p112);
         }
 
         //Z pomocą języka LINQ i metody SelectMany wykonaj złączenie
@@ -439,7 +482,20 @@ namespace LinqConsoleApp
                 dept
             });
 
+            var cross2 = from emp in Emps
+                      from dept in Depts
+                      select new
+                      {
+                          emp,
+                          dept
+                      };
+
             foreach (var emp in cross)
+            {
+                Console.WriteLine(emp);
+            }
+
+            foreach (var emp in cross2)
             {
                 Console.WriteLine(emp);
             }
